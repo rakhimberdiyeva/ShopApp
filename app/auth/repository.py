@@ -15,6 +15,13 @@ class UserRepository:
             self,
             username: str
     ) -> User | None:
+        """
+        Функция для получения пользователя из бд по username
+
+        :param username: имя пользователя
+
+        :return: моделька пользователя или ничего
+        """
         stmt = select(User).where(User.username == username)
         result = await self.session.execute(stmt)
         user = result.scalar_one_or_none()
@@ -25,7 +32,31 @@ class UserRepository:
             self,
             email: str
     ) -> User | None:
+        """
+        Функция для получения пользователя из бд по email
+
+        :param email: почта пользователя
+
+        :return: моделька пользователя или ничего
+        """
         stmt = select(User).where(User.email == email)
+        result = await self.session.execute(stmt)
+        user = result.scalar_one_or_none()
+        return user
+
+
+    async def get_user_by_id(
+            self,
+            user_id: int
+    ) -> User | None:
+        """
+        Функция для получения пользователя из бд по ИД
+
+        :param user_id: ИД пользователя
+
+        :return: моделька пользователя или ничего
+        """
+        stmt = select(User).where(User.id == user_id)
         result = await self.session.execute(stmt)
         user = result.scalar_one_or_none()
         return user
@@ -39,6 +70,18 @@ class UserRepository:
             hashed_password: str,
             role: str = "client"
     ) -> User:
+        """
+        Функция для создания пользователя
+
+        :param username: имя пользователя
+        :param email: почта пользователя
+        :param fullname: полное имя пользователя
+        :param hashed_password: хэшированный пароль
+        :param role: роль пользователя
+
+        :return: моделька пользователя
+        """
+
         stmt = insert(User).values(
             username=username,
             email=email,
@@ -53,21 +96,19 @@ class UserRepository:
 
 
 
-    async def get_user_by_id(
-            self,
-            user_id: int
-    ) -> User | None:
-        stmt = select(User).where(User.id == user_id)
-        result = await self.session.execute(stmt)
-        user = result.scalar_one_or_none()
-        return user
-
-
     async def change_password(
             self,
             user_id: int,
             hashed_password: str,
     ) -> None:
+        """
+        Функция для изменения пароля
+
+        :param user_id: ИД пользователя
+        :param hashed_password: хэшированный пароль
+
+        :return: ничего
+        """
         stmt = update(User).where(User.id == user_id).values(
             hashed_password=hashed_password
         )
