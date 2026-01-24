@@ -163,3 +163,9 @@ class UserRead(UserBase):
     is_active: bool
     created_at: datetime
     updated_at: datetime | None = None
+
+
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "Bearer"

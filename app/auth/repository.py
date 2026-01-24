@@ -96,7 +96,7 @@ class UserRepository:
 
 
 
-    async def change_password(
+    async def update_password(
             self,
             user_id: int,
             hashed_password: str,
