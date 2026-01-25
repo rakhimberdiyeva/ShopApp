@@ -3,9 +3,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_utils.cbv import cbv
 from starlette import status
 
-from app.auth.dependencies import get_auth_manager
+from app.auth.dependencies import get_auth_manager, get_current_user, oauth2_scheme
 from app.auth.manager import AuthManager
-from app.auth.schemas import Token, UserRead, UserRegister
+from app.auth.models import User
+from app.auth.schemas import Token, UserRead, UserRegister, ChangePasswordSchema
 
 router = APIRouter(
     prefix="/auth",
@@ -13,6 +14,7 @@ router = APIRouter(
 )
 
 # OAuth2PasswordRequestForm - multipart-data
+
 
 @cbv(router)
 class AuthRouter:
@@ -31,6 +33,9 @@ class AuthRouter:
             self,
             form_data: OAuth2PasswordRequestForm = Depends(),
     ):
+        """
+        Эндпоинт для входа в учетную запись
+        """
         response = await self.manager.login(form_data.username, form_data.password)
         return response
 
@@ -48,9 +53,68 @@ class AuthRouter:
             self,
             request: UserRegister,
     ):
+        """
+        Эндпоинт для регистрации
+        """
         response = await self.manager.register(request)
         return response
 
 
+
+    @router.get(
+        "/me",
+        summary="получение текущего пользователя",
+        response_model=UserRead,
+        status_code=status.HTTP_200_OK,
+        responses={
+
+        }
+    )
+    async def get_me(
+            self,
+            user: User = Depends(get_current_user),
+    ):
+        """
+        Эндпоинт для получения текущего пользователя
+        """
+        return user
     
 
+
+    @router.patch(
+        "/change_password",
+        summary="изменение пароля",
+        status_code=status.HTTP_200_OK,
+        responses={
+
+        }
+    )
+    async def change_password(
+            self,
+            request: ChangePasswordSchema,
+            user: User = Depends(get_current_user),
+    ):
+        """
+        Эндпоинт для изменения пароля пользователя
+        """
+        response = await self.manager.change_password(user, request)
+        return response
+
+
+    @router.post(
+        "/refresh",
+        summary="обновление токена",
+        status_code=status.HTTP_200_OK,
+        responses={
+
+        }
+    )
+    async def refresh(
+            self,
+            token: str = Depends(oauth2_scheme),
+    ):
+        """
+        Эндпоинт для обновления токена
+        """
+        response = await self.manager.refresh_token(token)
+        return response

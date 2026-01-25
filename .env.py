@@ -3,5 +3,5 @@ REFRESH_EXPIRES=10080
 TOKEN_ALGORITHM=HS256
 TOKEN_SECRET_KEY=0505f77259cf993385b4c384c03aeb5ccb1f187250b4a75ec4531ac5dfcd358f
 
-ASYNC_DATABASE_URL=postgresql+asyncpg://postgres:1@localhost:5432/ShopApp
+ASYNC_DATABASE_URL=postgresql+asyncpg://postgres:111@localhost:5432/ShopApp
 
