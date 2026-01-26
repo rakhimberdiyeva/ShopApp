@@ -1,4 +1,3 @@
-
 import re
 from datetime import datetime
 from enum import Enum
@@ -43,7 +42,7 @@ class UserBase(BaseModel):
         :return: валидированное имя пользователя
         """
 
-        if re.fullmatch(r'^[A-Za-z][A-Za-z0-9_]*$', value):
+        if not re.fullmatch(r'^[A-Za-z][A-Za-z0-9_]*$', value):
             raise ValueError("Имя пользователя должно содержать только буквы, цифры и _")
 
         return value.lower()
@@ -171,4 +170,5 @@ class Token(BaseModel):
     token_type: str = "Bearer"
 
 
-
+class RefreshToken(BaseModel):
+    refresh_token: str

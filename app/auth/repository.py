@@ -114,5 +114,3 @@ class UserRepository:
         )
         result = await self.session.execute(stmt)
         await self.session.flush()
-        user = result.scalars().first()
-        return user

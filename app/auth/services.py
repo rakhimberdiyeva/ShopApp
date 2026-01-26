@@ -64,8 +64,8 @@ class TokenService:
         }
         return jwt.encode(
             payload,
-            algorithm=settings.JWT_ALGORITHM,
-            key=settings.JWT_SECRET_KEY,
+            algorithm=settings.TOKEN_ALGORITHM,
+            key=settings.TOKEN_SECRET_KEY,
         )
 
     def decode(
@@ -83,7 +83,7 @@ class TokenService:
             payload = jwt.decode(
                 token,
                 algorithms=[settings.TOKEN_ALGORITHM],
-                key=settings.JWT_SECRET_KEY,
+                key=settings.TOKEN_SECRET_KEY,
 
             )
         except JWTError:

@@ -6,7 +6,7 @@ from starlette import status
 from app.auth.dependencies import get_auth_manager, get_current_user, oauth2_scheme
 from app.auth.manager import AuthManager
 from app.auth.models import User
-from app.auth.schemas import Token, UserRead, UserRegister, ChangePasswordSchema
+from app.auth.schemas import Token, UserRead, UserRegister, ChangePasswordSchema, RefreshToken
 
 router = APIRouter(
     prefix="/auth",
@@ -81,7 +81,7 @@ class AuthRouter:
     
 
 
-    @router.patch(
+    @router.post(
         "/change_password",
         summary="изменение пароля",
         status_code=status.HTTP_200_OK,
@@ -111,10 +111,10 @@ class AuthRouter:
     )
     async def refresh(
             self,
-            token: str = Depends(oauth2_scheme),
+            request: RefreshToken,
     ):
         """
         Эндпоинт для обновления токена
         """
-        response = await self.manager.refresh_token(token)
+        response = await self.manager.refresh_token(request.refresh_token)
         return response
