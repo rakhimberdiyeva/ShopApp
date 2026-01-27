@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from starlette import status
 
+from app.auth.dependencies import is_admin
 from app.category.dependencies import get_category_manager
 from app.category.manager import CategoryManager
-from app.category.schemas import CategoryCreate
+from app.category.schemas import CategoryCreate, CategoryUpdate
 
 router = APIRouter(
     prefix="/categories",
@@ -20,6 +21,9 @@ class AuthRouter:
         "/",
         summary="создание категории",
         status_code=status.HTTP_200_OK,
+        dependencies=[
+            Depends(is_admin)
+        ]
     )
     async def create(
             self,
@@ -60,4 +64,43 @@ class AuthRouter:
         Эндпоинт для получения всех категорий
         """
         response = await self.manager.get_all_categories()
+        return response
+
+
+    @router.put(
+        "/",
+        summary="обновление категории",
+        status_code=status.HTTP_200_OK,
+        dependencies=[
+            Depends(is_admin)
+        ]
+    )
+    async def update(
+            self,
+            category_id: int,
+            request: CategoryUpdate
+    ):
+        """
+        Эндпоинт для обновления категории
+        """
+        response = await self.manager.update_category(category_id, request)
+        return response
+
+
+    @router.delete(
+        "/",
+        summary="удаление категории",
+        status_code=status.HTTP_200_OK,
+        dependencies=[
+            Depends(is_admin)
+        ]
+    )
+    async def delete(
+            self,
+            category_id: int
+    ):
+        """
+        Эндпоинт для удаления категории
+        """
+        response = await self.manager.delete_category(category_id)
         return response

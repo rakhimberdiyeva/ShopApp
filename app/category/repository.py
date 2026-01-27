@@ -17,6 +17,14 @@ class CategoryRepository:
             name: str,
             description: str,
     ) -> Category:
+        """
+        Функция для создания категории
+
+        :param name: название категории
+        :param description: описание категории
+
+        :return: моделька категории
+        """
         stmt = insert(Category).values(
             name=name,
             description=description,
@@ -31,6 +39,13 @@ class CategoryRepository:
             self,
             category_id: int
     ) -> Category | None:
+        """
+        Функция для получения категории по ИД
+
+        :param category_id: ИД категории
+
+        :return: моделька категории или ничего
+        """
         stmt = select(Category).where(Category.id == category_id)
         result = await self.session.execute(stmt)
         category = result.scalar_one_or_none()
@@ -40,6 +55,11 @@ class CategoryRepository:
     async def get_categories(
             self,
     ):
+        """
+        Функция для получения всех категорий
+
+        :return: список категории
+        """
         stmt = select(Category)
         result = await self.session.execute(stmt)
         categories = result.scalars().all()
@@ -52,6 +72,15 @@ class CategoryRepository:
             name: str,
             description: str,
     ) -> None:
+        """
+        Функция для обновления категории
+
+        :param category_id: ИД категории
+        :param name: название категории
+        :param description: описание категории
+
+        :return: ничего
+        """
         stmt = update(Category).where(Category.id == category_id).values(
             name=name,
             description=description,
@@ -65,6 +94,13 @@ class CategoryRepository:
             self,
             category_id: int
     ) -> None:
+        """
+        Функция для удаления категории
+
+        :param category_id: ИД категории
+
+        :return: ничего
+        """
         stmt = delete(Category).where(Category.id == category_id)
         await self.session.execute(stmt)
         await self.session.flush()

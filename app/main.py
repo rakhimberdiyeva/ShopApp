@@ -6,6 +6,8 @@ from starlette.responses import JSONResponse
 
 
 from app.auth.router import router as auth_router
+from app.category.router import router as category_router
+
 from app.core.exceptions import Unauthorized, Forbidden, NotFound, Conflict, BadRequest
 
 app = FastAPI()
@@ -65,3 +67,4 @@ async def bad_request_exception_handler(request: Request, exc: BadRequest):
 
 
 app.include_router(auth_router)
+app.include_router(category_router)
