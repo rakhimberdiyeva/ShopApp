@@ -21,6 +21,7 @@ if config.config_file_name is not None:
 from app.core.models import Base
 from app.auth.models import User
 from app.category.models import Category
+from app.product.models import Product, ProductCharacteristics, ProductReview
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

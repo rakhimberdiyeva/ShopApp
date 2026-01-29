@@ -55,8 +55,7 @@ class CategoryManager:
 
 
     async def get_all_categories(
-            self
-    ) -> list[Category]:
+            self    ) -> list[Category]:
         """
         Метод для получения всех категорий
 
