@@ -55,7 +55,7 @@ class ProductRepository:
         """
         Функция для обновления продукта
 
-        :param product_id: нИд продукта
+        :param product_id: Ид продукта
         :param name: название продукта
         :param short_description: краткое описание продукта
         :param long_description: длинное описание продукта
@@ -84,7 +84,7 @@ class ProductRepository:
         """
         Функция для удаления продукта
 
-        :param product_id: нИд продукта
+        :param product_id: Ид продукта
 
         :return: ничего
         """
@@ -96,12 +96,12 @@ class ProductRepository:
 
     async def get_by_id(
             self,
-            product_id
+            product_id: int
     ) -> Product:
         """
         Функция для получения продукта по ИД
 
-        :param product_id: нИд продукта
+        :param product_id: Ид продукта
 
         :return: моделька продукта
         """

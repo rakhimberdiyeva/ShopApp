@@ -15,16 +15,13 @@ class ProductCharacteristicsRepository:
             product_id,
     ) -> ProductCharacteristics:
         """
-        Функция для создания продукта
+        Функция для создания характеристики продукта
 
-        :param name: название продукта
-        :param short_description: краткое описание продукта
-        :param long_description: длинное описание продукта
-        :param price: цена продукта
-        :param category_id: Ид категории продукта
+        :param name: название характеристики
+        :param value: значение характеристики
+        :param product_id: ИД продукта
 
-
-        :return: моделька продукта
+        :return: моделька характеристики продукта
         """
 
         stmt = insert(ProductCharacteristics).values(
@@ -48,15 +45,12 @@ class ProductCharacteristicsRepository:
             product_id,
     ) -> None:
         """
-        Функция для обновления продукта
+        Функция для обновления характеристики продукта
 
-        :param product_id: нИд продукта
-        :param name: название продукта
-        :param short_description: краткое описание продукта
-        :param long_description: длинное описание продукта
-        :param price: цена продукта
-        :param category_id: Ид категории продукта
-
+        :param characteristic_id: Ид характеристики
+        :param name: название характеристики
+        :param value: значение характеристики
+        :param product_id: ИД продукта
 
         :return: ничего
         """
@@ -76,9 +70,9 @@ class ProductCharacteristicsRepository:
             characteristic_id
     ) -> None:
         """
-        Функция для удаления продукта
+        Функция для удаления характеристики продукта
 
-        :param product_id: нИд продукта
+        :param characteristic_id: Ид характеристики
 
         :return: ничего
         """
@@ -93,11 +87,11 @@ class ProductCharacteristicsRepository:
             characteristic_id
     ) -> ProductCharacteristics:
         """
-        Функция для получения продукта по ИД
+        Функция для получения характеристики продукта по ИД
 
-        :param product_id: нИд продукта
+        :param characteristic_id: Ид характеристики
 
-        :return: моделька продукта
+        :return: моделька характеристики
         """
 
         stmt = select(ProductCharacteristics).where(ProductCharacteristics.id == characteristic_id)

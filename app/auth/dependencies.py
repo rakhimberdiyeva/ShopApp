@@ -48,7 +48,9 @@ async def is_admin(
     """
     Функция для проверки является ли пользователь админом
 
-    :return: user AuthManager
+    :param user: моделька пользователя
+
+    :return: моделька пользователя
     """
     if user.role != RoleEnum.admin.value:
         raise Forbidden(

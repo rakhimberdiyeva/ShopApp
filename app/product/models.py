@@ -61,7 +61,7 @@ class ProductReview(Base, IntIdMixin, TimeActionMixin):
 
     Attributes:
          id: уникальной идентификатор
-         user_id: Ид пользователя
+         user_id: ИД пользователя
          product_id: ИД продукта
          message: текст отзыва
          grade: оценка отзыва
