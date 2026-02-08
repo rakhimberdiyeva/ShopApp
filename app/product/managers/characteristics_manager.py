@@ -65,22 +65,22 @@ class ProductCharacteristicsManager:
     async def update_characteristic(
             self,
             request: ProductCharacteristicsUpdate,
-            characteristic_id: int,
+            characteristic: ProductCharacteristics,
             product: Product
     ) -> None:
         """
         Метод для обновления характеристики продукта
 
         :param request: запрос с данными для обновления
-        :param characteristic_id: ИД характеристики
+        :param characteristic: моделька характеристики
         :param product: моделька продукта
 
         :return: ничего
         """
 
         await self.characteristics_repo.update(
+            characteristic,
             **request.model_dump(),
-            characteristic_id=characteristic_id,
             product_id=product.id
         )
         await self.session.commit()
@@ -89,17 +89,17 @@ class ProductCharacteristicsManager:
 
     async def delete_characteristic(
             self,
-            characteristic_id: int
+            characteristic: ProductCharacteristics,
     ) -> None:
         """
         Метод для удаления характеристики продукта
 
-        :param characteristic_id: ИД характеристики
+        :param characteristic: моделька характеристики
 
         :return: ничего
         """
 
         await self.characteristics_repo.delete(
-            characteristic_id=characteristic_id
+            characteristic
         )
         await self.session.commit()

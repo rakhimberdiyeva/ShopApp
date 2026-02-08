@@ -41,7 +41,7 @@ class ProductReviewRepository:
 
     async def update(
             self,
-            review_id,
+            review: ProductReview,
             user_id,
             product_id,
             message,
@@ -50,40 +50,35 @@ class ProductReviewRepository:
         """
         Функция для обновления отзыва продукта
 
-        :param review_id: ИД отзыва
+        :param review: моделька отзыва
         :param user_id: ИД пользователя
         :param product_id: ИД продукта
         :param message: текст
         :param grade: оценка
 
-
         :return: ничего
         """
 
-        stmt = update(ProductReview).where(ProductReview.id == review_id).values(
-            user_id=user_id,
-            product_id=product_id,
-            message=message,
-            grade=grade
-        )
-        await self.session.execute(stmt)
+        review.user_id = user_id
+        review.product_id = product_id
+        review.message = message
+        review.grade = grade
+        self.session.add(review)
         await self.session.flush()
 
 
     async def delete(
             self,
-            review_id
+            review: ProductReview
     ) -> None:
         """
         Функция для удаления отзыва продукта
 
-        :param review_id: ИД отзыва
+        :param review: моделька отзыва
 
         :return: ничего
         """
-
-        stmt = delete(ProductReview).where(ProductReview.id == review_id)
-        await self.session.execute(stmt)
+        await self.session.delete(review)
         await self.session.flush()
 
 

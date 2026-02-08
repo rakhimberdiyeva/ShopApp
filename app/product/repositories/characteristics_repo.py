@@ -39,7 +39,7 @@ class ProductCharacteristicsRepository:
 
     async def update(
             self,
-            characteristic_id: int,
+            characteristic: ProductCharacteristics,
             name,
             value,
             product_id,
@@ -47,7 +47,7 @@ class ProductCharacteristicsRepository:
         """
         Функция для обновления характеристики продукта
 
-        :param characteristic_id: Ид характеристики
+        :param characteristic: моделька характеристики
         :param name: название характеристики
         :param value: значение характеристики
         :param product_id: ИД продукта
@@ -55,30 +55,27 @@ class ProductCharacteristicsRepository:
         :return: ничего
         """
 
-        stmt = update(ProductCharacteristics).where(ProductCharacteristics.id == characteristic_id).values(
-            name=name,
-            value=value,
-            product_id=product_id,
-        )
-        await self.session.execute(stmt)
+        characteristic.name = name
+        characteristic.value = value
+        characteristic.product_id = product_id
+        self.session.add(characteristic)
         await self.session.flush()
 
 
 
     async def delete(
             self,
-            characteristic_id
+            characteristic: ProductCharacteristics,
     ) -> None:
         """
         Функция для удаления характеристики продукта
 
-        :param characteristic_id: Ид характеристики
+        :param characteristic: моделька характеристики
 
         :return: ничего
         """
 
-        stmt = delete(ProductCharacteristics).where(ProductCharacteristics.id == characteristic_id)
-        await self.session.execute(stmt)
+        await self.session.delete(characteristic)
         await self.session.flush()
 
 
@@ -98,6 +95,7 @@ class ProductCharacteristicsRepository:
         result = await self.session.execute(stmt)
         characteristics = result.scalar_one_or_none()
         return characteristics
+
 
     async def get_all(self):
         pass

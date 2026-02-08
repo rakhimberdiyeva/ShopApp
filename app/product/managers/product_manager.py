@@ -76,6 +76,7 @@ class ProductManager:
             await get_category_or_404(request.category_id, self.session)
 
         await self.product_repo.update(
+            product,
             **request.model_dump()
         )
         await self.session.commit()
@@ -84,17 +85,17 @@ class ProductManager:
 
     async def delete_product(
             self,
-            product_id: int
+            product: Product
     ) -> None:
         """
         Метод для удаления продукта
 
-        :param product_id: ИД продукта
+        :param product: моделька продукта
 
         :return: ничего
         """
 
         await self.product_repo.delete(
-            product_id=product_id
+            product
         )
         await self.session.commit()

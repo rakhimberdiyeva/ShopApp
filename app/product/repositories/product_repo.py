@@ -45,7 +45,7 @@ class ProductRepository:
 
     async def update(
             self,
-            product_id,
+            product: Product,
             name,
             short_description,
             long_description,
@@ -55,7 +55,7 @@ class ProductRepository:
         """
         Функция для обновления продукта
 
-        :param product_id: Ид продукта
+        :param product: моделька продукта
         :param name: название продукта
         :param short_description: краткое описание продукта
         :param long_description: длинное описание продукта
@@ -66,31 +66,28 @@ class ProductRepository:
         :return: ничего
         """
 
-        stmt = update(Product).where(Product.id == product_id).values(
-            name=name,
-            short_description=short_description,
-            long_description=long_description,
-            price=price,
-            category_id=category_id
-        )
-        await self.session.execute(stmt)
+        product.name = name
+        product.short_description = short_description
+        product.long_description = long_description
+        product.price = price
+        product.category_id = category_id
+        self.session.add(product)
         await self.session.flush()
 
 
     async def delete(
             self,
-            product_id
+            product: Product,
     ) -> None:
         """
         Функция для удаления продукта
 
-        :param product_id: Ид продукта
+        :param product: моделька продукта
 
         :return: ничего
         """
 
-        stmt = delete(Product).where(Product.id == product_id)
-        await self.session.execute(stmt)
+        await self.session.delete(product)
         await self.session.flush()
 
 

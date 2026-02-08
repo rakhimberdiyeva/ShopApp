@@ -69,7 +69,7 @@ class ProductReviewManager:
     async def update_review(
             self,
             request: ProductReviewUpdate,
-            review_id: int,
+            review: ProductReview,
             product: Product,
             user_id: int
     ) -> None:
@@ -77,7 +77,7 @@ class ProductReviewManager:
         Метод для обновления отзыва
 
         :param request: запрос с данными для обновления
-        :param review_id: ИД отзыва
+        :param review: моделька отзыва
         :param product: моделька продукта
         :param user_id: ИД пользователя
 
@@ -85,8 +85,8 @@ class ProductReviewManager:
         """
 
         await self.review_repo.update(
+            review,
             **request.model_dump(),
-            review_id=review_id,
             product_id=product.id,
             user_id=user_id,
         )
@@ -96,17 +96,17 @@ class ProductReviewManager:
 
     async def delete_review(
             self,
-            review_id: int
+            review: ProductReview
     ) -> None:
         """
         Метод для удаления отзыва
 
-        :param review_id:: ИД отзыва
+        :param review:: моделька отзыва
 
         :return: ничего
         """
 
         await self.review_repo.delete(
-            review_id=review_id
+            review
         )
         await self.session.commit()
