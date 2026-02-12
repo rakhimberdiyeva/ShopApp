@@ -19,20 +19,19 @@ class ProductCharacteristicsManager:
     async def create_characteristic(
             self,
             request: ProductCharacteristicsCreate,
-            product_id: int
+            product: Product
     ) -> ProductCharacteristics:
         """
         Метод для создания характеристики продукта
 
         :param request: запрос с данными для создания
-        :param product_id: ИД продукта
+        :param product: моделька продукта
 
         :return: созданный продукт
         """
-        await get_product_or_404(product_id, self.session)
         characteristic = await self.characteristics_repo.create(
             **request.model_dump(),
-            product_id=product_id
+            product_id=product.id
         )
         await self.session.commit()
         return characteristic
@@ -40,40 +39,45 @@ class ProductCharacteristicsManager:
 
     async def get_characteristic(
             self,
+            product: Product,
             characteristic_id: int
     ) -> ProductCharacteristics:
         """
         Метод для получения характеристики продукта по ИД
 
+        :param product: моделька продукта
         :param characteristic_id: ИД характеристики
 
         :return: моделька характеристики
         """
-        characteristic = await self.characteristics_repo.get_by_id(characteristic_id)
+        characteristic = await self.characteristics_repo.get_by_id(characteristic_id, product.id)
         if not characteristic:
             raise CharacteristicNotFound(
-                "Характеристика продукт не найдена"
+                "Характеристика продукта не найдена"
             )
         return characteristic
 
 
-    # TODO
-    async def get_all(self):
-        pass
+
+    async def get_all(
+            self,
+            product: Product,
+    ):
+       characteristics = await self.characteristics_repo.get_all(product.id)
+       return characteristics
+
 
 
     async def update_characteristic(
             self,
             request: ProductCharacteristicsUpdate,
-            characteristic: ProductCharacteristics,
-            product: Product
+            characteristic: ProductCharacteristics
     ) -> None:
         """
         Метод для обновления характеристики продукта
 
         :param request: запрос с данными для обновления
         :param characteristic: моделька характеристики
-        :param product: моделька продукта
 
         :return: ничего
         """
@@ -81,7 +85,6 @@ class ProductCharacteristicsManager:
         await self.characteristics_repo.update(
             characteristic,
             **request.model_dump(),
-            product_id=product.id
         )
         await self.session.commit()
 

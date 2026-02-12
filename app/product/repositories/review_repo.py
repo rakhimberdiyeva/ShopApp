@@ -42,8 +42,6 @@ class ProductReviewRepository:
     async def update(
             self,
             review: ProductReview,
-            user_id,
-            product_id,
             message,
             grade
     ) -> None:
@@ -51,16 +49,12 @@ class ProductReviewRepository:
         Функция для обновления отзыва продукта
 
         :param review: моделька отзыва
-        :param user_id: ИД пользователя
-        :param product_id: ИД продукта
         :param message: текст
         :param grade: оценка
 
         :return: ничего
         """
 
-        review.user_id = user_id
-        review.product_id = product_id
         review.message = message
         review.grade = grade
         self.session.add(review)
@@ -84,7 +78,8 @@ class ProductReviewRepository:
 
     async def get_by_id(
             self,
-            review_id
+            review_id,
+            productid
     ) -> ProductReview:
         """
         Функция для получения продукта по ИД
@@ -94,11 +89,28 @@ class ProductReviewRepository:
         :return: моделька отзыва
         """
 
-        stmt = select(ProductReview).where(ProductReview.id == review_id)
+        stmt = select(ProductReview).where(
+            ProductReview.id == review_id,
+            ProductReview.product_id == productid
+        )
         result = await self.session.execute(stmt)
         review = result.scalar_one_or_none()
         return review
 
 
-    async def get_all(self):
-        pass
+    async def get_all(
+            self,
+            product_id,
+    ):
+        """
+        Функция для получения всех отзывов
+
+        :param product_id: Ид продукта
+
+        :return: моделька отзывов
+        """
+        stmt = select(ProductReview).where(
+            ProductReview.product_id == product_id,
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

@@ -30,6 +30,7 @@ async def get_current_user(
     user = await manager.get_me(token)
     return user
 
+
 async def get_auth_manager(
     session: AsyncSession = Depends(get_db)
 ):

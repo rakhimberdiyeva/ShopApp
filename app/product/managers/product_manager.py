@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.category.dependencies import get_category_or_404
 from app.product.exceptions import ProductNotFound
+from app.product.filters import ProductFilter
 from app.product.models import Product
 from app.product.repositories.product_repo import ProductRepository
 from app.product.schemas import ProductCreate, ProductUpdate
@@ -54,9 +55,14 @@ class ProductManager:
         return product
 
 
-    # TODO
-    async def get_all(self):
-        pass
+
+    async def get_all(
+            self,
+            filters: ProductFilter
+    ):
+        products = await self.product_repo.get_all(filters)
+        return products
+
 
 
     async def update_product(

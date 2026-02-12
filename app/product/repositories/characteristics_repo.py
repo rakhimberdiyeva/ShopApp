@@ -42,7 +42,6 @@ class ProductCharacteristicsRepository:
             characteristic: ProductCharacteristics,
             name,
             value,
-            product_id,
     ) -> None:
         """
         Функция для обновления характеристики продукта
@@ -50,14 +49,12 @@ class ProductCharacteristicsRepository:
         :param characteristic: моделька характеристики
         :param name: название характеристики
         :param value: значение характеристики
-        :param product_id: ИД продукта
 
         :return: ничего
         """
 
         characteristic.name = name
         characteristic.value = value
-        characteristic.product_id = product_id
         self.session.add(characteristic)
         await self.session.flush()
 
@@ -81,21 +78,40 @@ class ProductCharacteristicsRepository:
 
     async def get_by_id(
             self,
-            characteristic_id
+            characteristic_id,
+            product_id,
     ) -> ProductCharacteristics:
         """
         Функция для получения характеристики продукта по ИД
 
         :param characteristic_id: Ид характеристики
+        :param product_id: Ид продукта
 
         :return: моделька характеристики
         """
 
-        stmt = select(ProductCharacteristics).where(ProductCharacteristics.id == characteristic_id)
+        stmt = select(ProductCharacteristics).where(
+            ProductCharacteristics.id == characteristic_id,
+            ProductCharacteristics.product_id == product_id,
+        )
         result = await self.session.execute(stmt)
         characteristics = result.scalar_one_or_none()
         return characteristics
 
 
-    async def get_all(self):
-        pass
+    async def get_all(
+            self,
+            product_id,
+    ):
+        """
+        Функция для получения всех характеристик
+
+        :param product_id: Ид продукта
+
+        :return: моделька характеристик
+        """
+        stmt = select(ProductCharacteristics).where(
+            ProductCharacteristics.product_id == product_id,
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

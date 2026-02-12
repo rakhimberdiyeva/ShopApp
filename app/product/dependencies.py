@@ -8,43 +8,73 @@ from app.core.exceptions import Forbidden
 from app.product.managers.characteristics_manager import ProductCharacteristicsManager
 from app.product.managers.product_manager import ProductManager
 from app.product.managers.review_manager import ProductReviewManager
-from app.product.models import ProductReview
+from app.product.models import ProductReview, Product
+
+
+async def get_product_manager(
+    session: AsyncSession = Depends(get_db)
+):
+    """
+    Функция для создания объекта ProductManager
+
+    :param session: сессия бд
+
+    :return: объект ProductManager
+    """
+
+    return ProductManager(session)
+
 
 
 async def get_product_or_404(
     product_id: int,
-    session: AsyncSession = Depends(get_db)
+    manager: ProductManager = Depends(get_product_manager),
 ):
     """
     Функция для поиска продукта
     Если продукта нет вызывает ошибку 404
 
     :param product_id: ИД продукта
-    :param session: сессия бд
+    :param manager: объект ProductManager
 
     :return: моделька продукта
     """
 
-    manager = ProductManager(session)
     return await manager.get_product(product_id)
+
+
+async def get_characteristics_manager(
+    session: AsyncSession = Depends(get_db)
+):
+    """
+    Функция для создания объекта ProductCharacteristicsManager
+
+    :param session: сессия бд
+
+    :return: объект ProductCharacteristicsManager
+    """
+
+    return ProductCharacteristicsManager(session)
 
 
 async def get_characteristics_or_404(
     characteristic_id: int,
-    session: AsyncSession = Depends(get_db)
+    product: Product = Depends(get_product_or_404),
+    manager: ProductCharacteristicsManager = Depends(get_characteristics_manager),
 ):
     """
     Функция для поиска характеристики продукта
     Если характеристики нет вызывает ошибку 404
 
     :param characteristic_id: ИД характеристики
-    :param session: сессия бд
+    :param product: объект продукта
+    :param manager: объект ProductCharacteristicsManager
 
     :return: моделька характеристики
     """
 
-    manager = ProductCharacteristicsManager(session)
-    return await manager.get_characteristic(characteristic_id)
+
+    return await manager.get_characteristic(product, characteristic_id)
 
 
 async def get_review_or_404(

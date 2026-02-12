@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.models import User
 from app.product.dependencies import get_product_or_404
 from app.product.exceptions import ReviewNotFound
 from app.product.models import ProductReview, Product
@@ -19,24 +20,23 @@ class ProductReviewManager:
     async def create_review(
             self,
             request: ProductReviewCreate,
-            user_id: int,
-            product_id: int
+            user: User,
+            product: Product
     ) -> ProductReview:
         """
         Метод для создания отзыва
 
         :param request: запрос с данными для создания
-        :param user_id: ИД пользователя
-        :param product_id: ИД продукта
+        :param user: моделька пользователя
+        :param product: моделька продукта
 
         :return: созданный отзыв
         """
 
-        await get_product_or_404(product_id, self.session)
         review = await self.review_repo.create(
             **request.model_dump(),
-            user_id=user_id,
-            product_id=product_id
+            user_id=user.id,
+            product_id=product.id
         )
         await self.session.commit()
         return review
@@ -44,16 +44,18 @@ class ProductReviewManager:
 
     async def get_review(
             self,
+            product: Product,
             review_id: int
     ) -> ProductReview:
         """
         Метод для получения отзыва по ИД
 
+        :param product: моделька продукта
         :param review_id: ИД отзыва
 
         :return: моделька отзыва
         """
-        review = await self.review_repo.get_by_id(review_id)
+        review = await self.review_repo.get_by_id(review_id, product.id)
         if not review:
             raise ReviewNotFound(
                 "Отзыв не найден"
@@ -61,25 +63,24 @@ class ProductReviewManager:
         return review
 
 
-    # TODO
-    async def get_all(self):
-        pass
+    async def get_all(
+            self,
+            product: Product,
+    ):
+        review = await self.review_repo.get_all(product.id)
+        return review
 
 
     async def update_review(
             self,
             request: ProductReviewUpdate,
             review: ProductReview,
-            product: Product,
-            user_id: int
     ) -> None:
         """
         Метод для обновления отзыва
 
         :param request: запрос с данными для обновления
         :param review: моделька отзыва
-        :param product: моделька продукта
-        :param user_id: ИД пользователя
 
         :return: ничего
         """
@@ -87,8 +88,6 @@ class ProductReviewManager:
         await self.review_repo.update(
             review,
             **request.model_dump(),
-            product_id=product.id,
-            user_id=user_id,
         )
         await self.session.commit()
 
