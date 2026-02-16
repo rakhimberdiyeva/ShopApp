@@ -4,9 +4,9 @@ from app.product.models import Product
 
 
 class ProductFilter(Filter):
-    q: str = None
-    category_id: int = None
-    order_by: list[str] = None
+    q: str | None = None
+    category_id: int | None  = None
+    order_by: list[str] | None  = None
 
     class Constants(Filter.Constants):
         model = Product

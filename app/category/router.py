@@ -3,6 +3,7 @@ from fastapi_utils.cbv import cbv
 from starlette import status
 
 from app.auth.dependencies import is_admin
+from app.auth.models import User
 from app.category.dependencies import get_category_manager
 from app.category.manager import CategoryManager
 from app.category.schemas import CategoryCreate, CategoryUpdate
@@ -68,7 +69,7 @@ class AuthRouter:
 
 
     @router.put(
-        "/",
+        "/{category_id}",
         summary="обновление категории",
         status_code=status.HTTP_200_OK,
         dependencies=[
@@ -78,7 +79,7 @@ class AuthRouter:
     async def update(
             self,
             category_id: int,
-            request: CategoryUpdate
+            request: CategoryUpdate,
     ):
         """
         Эндпоинт для обновления категории
@@ -88,7 +89,7 @@ class AuthRouter:
 
 
     @router.delete(
-        "/",
+        "/{category_id}",
         summary="удаление категории",
         status_code=status.HTTP_200_OK,
         dependencies=[
@@ -97,7 +98,7 @@ class AuthRouter:
     )
     async def delete(
             self,
-            category_id: int
+            category_id: int,
     ):
         """
         Эндпоинт для удаления категории

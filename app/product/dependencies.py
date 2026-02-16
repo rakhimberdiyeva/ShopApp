@@ -77,26 +77,43 @@ async def get_characteristics_or_404(
     return await manager.get_characteristic(product, characteristic_id)
 
 
+async def get_review_manager(
+    session: AsyncSession = Depends(get_db)
+):
+    """
+    Функция для создания объекта ProductReviewManager
+
+    :param session: сессия бд
+
+    :return: объект ProductReviewManager
+    """
+
+    return ProductReviewManager(session)
+
+
+
+
 async def get_review_or_404(
     review_id: int,
-    session: AsyncSession = Depends(get_db)
+    product: Product = Depends(get_product_or_404),
+    manager: ProductReviewManager = Depends(get_review_manager)
 ):
     """
     Функция для поиска отзыва
     Если отзыва нет вызывает ошибку 404
 
     :param review_id: ИД отзыва
-    :param session: сессия бд
+    :param product: объект продукта
+    :param manager: объект ProductReviewManager
 
     :return: моделька отзыва
     """
 
-    manager = ProductReviewManager(session)
-    return await manager.get_review(review_id)
+    return await manager.get_review(product, review_id)
 
 
 async def is_review_owner(
-        review: ProductReview,
+        review: ProductReview  = Depends(get_review_or_404),
         user: User = Depends(get_current_user)
 ) -> None:
     """

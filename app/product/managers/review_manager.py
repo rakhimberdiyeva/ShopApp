@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import User
-from app.product.dependencies import get_product_or_404
 from app.product.exceptions import ReviewNotFound
 from app.product.models import ProductReview, Product
 from app.product.repositories.review_repo import ProductReviewRepository
@@ -67,6 +66,13 @@ class ProductReviewManager:
             self,
             product: Product,
     ):
+        """
+        Метод для получения всех отзывов продукта
+
+        :param product: моделька продукта
+
+        :return: список отзывов
+        """
         review = await self.review_repo.get_all(product.id)
         return review
 

@@ -60,6 +60,13 @@ class ProductManager:
             self,
             filters: ProductFilter
     ):
+        """
+        Метод для получения всех продуктов
+
+        :param filters: фильтры
+
+        :return: список продуктов
+        """
         products = await self.product_repo.get_all(filters)
         return products
 

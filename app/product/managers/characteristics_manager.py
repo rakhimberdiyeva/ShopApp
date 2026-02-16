@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.product.dependencies import get_product_or_404
+
 from app.product.exceptions import CharacteristicNotFound
 from app.product.models import ProductCharacteristics, Product
 from app.product.repositories.characteristics_repo import ProductCharacteristicsRepository
@@ -63,8 +63,15 @@ class ProductCharacteristicsManager:
             self,
             product: Product,
     ):
-       characteristics = await self.characteristics_repo.get_all(product.id)
-       return characteristics
+        """
+        Метод для получения всех характеристик продукта
+
+        :param product: моделька продукта
+
+        :return: список характеристик
+        """
+        characteristics = await self.characteristics_repo.get_all(product.id)
+        return characteristics
 
 
 

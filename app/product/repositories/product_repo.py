@@ -114,6 +114,13 @@ class ProductRepository:
             self,
             filters: ProductFilter
     ):
+        """
+        Функция для получения всех продуктов
+
+        :param filters: фильтры
+
+        :return: список продуктов
+        """
         stmt = select(Product)
         if filters:
             stmt = filters.filter(stmt)
