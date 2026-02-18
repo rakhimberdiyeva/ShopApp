@@ -13,10 +13,9 @@ class OrderStatusEnum(str, Enum):
 
 
 class OrderProductsBase(BaseModel):
-    order_id: int
     product_id: int
-    quantity: int
-    price: Decimal = Field(max_digits=20, decimal_places=2)
+    quantity: int = Field(ge=0)
+    price: float = Field(ge=0)
 
 
 class OrderProductsCreate(OrderProductsBase):
@@ -36,24 +35,25 @@ class OrderBase(BaseModel):
     address: str = Field(max_length=255)
     phone_number: str = Field(max_length=20)
     comment: str = Field(max_length=255)
+    status: OrderStatusEnum = OrderStatusEnum.new
 
 
 class OrderCreate(OrderBase):
-    user_id: int
-    status: OrderStatusEnum = OrderStatusEnum.new
+    products: list[OrderProductsCreate]
+
 
 class OrderUpdate(OrderBase):
-    pass
+    products: list[OrderProductsUpdate]
 
 
 class OrderStatusUpdate(BaseModel):
-    status: str = Field(max_length=30)
+    status: OrderStatusEnum = OrderStatusEnum.new
 
 
 class OrderRead(OrderBase):
     id: int
     user_id: int
-    status: OrderStatusEnum = OrderStatusEnum.new
     created_at: datetime
     products: list[OrderProductsRead]
+    total_sum: float
 

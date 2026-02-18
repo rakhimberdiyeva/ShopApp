@@ -2,6 +2,8 @@ from sqlalchemy import insert, update, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.order.models import Order, OrderProduct
+from app.order.schemas import OrderProductsCreate
+from app.product.dependencies import get_product_or_404
 
 
 class OrderProductsRepository:
@@ -10,109 +12,49 @@ class OrderProductsRepository:
 
     async def create(
             self,
-            order_id,
-            product_id,
-            quantity,
-            price,
-    ) -> Order:
-        """
-        Функция для создания продукта заказа
+            products: list[OrderProductsCreate],
+            order: Order
+    ):
+        order_products = [
+            OrderProduct(
+                order_id=order.id,
+                quantity=product.quantity,
+                price=product.price,
+                product_id=product.product_id
+            )
+            for product in products
+        ]
 
-        :param order_id: Ид заказа
-        :param product_id: Ид продукта
-        :param quantity: количество
-        :param price: цена
+        self.session.add_all(order_products)
+        await self.session.flush()
 
-        :return: моделька продукта заказа
-        """
 
-        stmt = insert(Order).values(
-            order_id=order_id,
-            product_id=product_id,
-            quantity=quantity,
-            price=price,
-        ).returning(Order)
-
+    async def get(
+            self,
+            order: Order,
+            order_product: OrderProduct
+    ):
+        stmt = select(OrderProduct).where(OrderProduct.order_id == order.id, OrderProduct.product_id==order_product.product_id)
         result = await self.session.execute(stmt)
-        await self.session.flush()
-        product = result.scalars().first()
-        return product
-
-
-    async def update(
-            self,
-            order_products: OrderProduct,
-            order_id,
-            product_id,
-            quantity,
-            price,
-    ) -> None:
-        """
-        Функция для обновления продукта заказа
-
-        :param order_products: моделька продукта заказа
-        :param order_id: Ид заказа
-        :param product_id: Ид продукта
-        :param quantity: количество
-        :param price: цена
-
-        :return: ничего
-        """
-
-        order_products.order_id = order_id
-        order_products.product_id = product_id
-        order_products.quantity = quantity
-        order_products.price = price
-        self.session.add(order_products)
-        await self.session.flush()
-
-
-
-    async def delete(
-            self,
-            order_products: OrderProduct,
-    ) -> None:
-        """
-        Функция для удаления продукта заказа
-
-        :param order_products: моделька продукта заказа
-
-        :return: ничего
-        """
-
-        await self.session.delete(order_products)
-        await self.session.flush()
-
-
-    async def get_by_id(
-            self,
-            order_product_id: int
-    ) -> OrderProduct:
-        """
-        Функция для получения продуктов заказа по ИД
-
-        :param order_product_id: моделька продуктов заказа
-
-        :return: моделька продуктов заказов
-        """
-
-        stmt = select(Order).where(OrderProduct.id == order_product_id)
-        result = await self.session.execute(stmt)
-        order = result.scalar_one_or_none()
-        return order
+        products = result.scalar_one_or_none()
+        return products
 
 
     async def get_all(
             self,
-            order_id: int
+            order: Order
     ):
-        """
-        Функция для получения всех продуктов заказа
-
-        :param order_id: Ид заказа
-
-        :return: список продуктов заказа
-        """
-        stmt = select(OrderProduct).where(OrderProduct.order_id == order_id)
+        stmt = select(OrderProduct).where(OrderProduct.order_id == order.id)
         result = await self.session.execute(stmt)
-        return result.scalars().all()
+        products = result.scalars().all()
+        return products
+
+
+    async def delete(
+            self,
+            order: Order,
+            order_product: OrderProduct
+    ) -> None:
+        stmt = delete(OrderProduct).where(OrderProduct.order_id == order.id, OrderProduct.product_id == order_product.product_id)
+        await self.session.execute(stmt)
+        await self.session.flush()

@@ -1,0 +1,1 @@
+from app.order.routers.order_router import router as order_router

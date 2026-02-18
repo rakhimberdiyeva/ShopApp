@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.order.models import Order
 
 
-
 class OrderRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -47,27 +46,27 @@ class OrderRepository:
     async def update(
             self,
             order: Order,
-            user_id,
             address,
             phone_number,
             comment,
+            status
     ) -> None:
         """
         Функция для обновления заказа
 
         :param order: моделька заказа
-        :param user_id: Ид пользователя
         :param address: адрес
         :param phone_number: номер телефона
         :param comment: комментарий
+        :param status: статус
 
         :return: ничего
         """
 
-        order.user_id = user_id
         order.address = address
         order.phone_number = phone_number
         order.comment = comment
+        order.status = status
         self.session.add(order)
         await self.session.flush()
 
@@ -120,6 +119,7 @@ class OrderRepository:
         :return: моделька заказа
         """
 
+
         stmt = select(Order).where(Order.id == order_id)
         result = await self.session.execute(stmt)
         order = result.scalar_one_or_none()
@@ -128,12 +128,19 @@ class OrderRepository:
 
     async def get_all(
             self,
+            filters
     ):
         """
         Функция для получения всех заказов
 
+        param filters: фильтры
+
         :return: список заказов
         """
         stmt = select(Order)
+        if filters:
+            stmt = filters.filter(stmt)
+            stmt = filters.sort(stmt)
         result = await self.session.execute(stmt)
-        return result.scalars().all()
+        order = result.scalars().all()
+        return order
