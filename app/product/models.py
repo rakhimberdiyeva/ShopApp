@@ -1,7 +1,9 @@
 from sqlalchemy import Column, String, Text, Numeric, BigInteger, ForeignKey, Integer
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
 from app.core.models import IntIdMixin, TimeActionMixin, Base
+from app.core.settings import settings
 
 
 class Product(Base, IntIdMixin, TimeActionMixin):
@@ -29,6 +31,7 @@ class Product(Base, IntIdMixin, TimeActionMixin):
 
     characteristics = relationship("ProductCharacteristics", backref="product", lazy="selectin")
     reviews = relationship("ProductReview", backref="product", lazy="selectin")
+    images = relationship("ProductImages", backref="product", lazy="selectin")
 
 
 
@@ -51,8 +54,16 @@ class ProductCharacteristics(Base, IntIdMixin):
     product_id = Column(BigInteger, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
 
 
-# class ProductImage(Base, IntIdMixin):
-#     __tablename__ = "product_images"
+class ProductImages(Base, IntIdMixin):
+    __tablename__ = "product_images"
+    product_id = Column(BigInteger, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    filename = Column(String(512), nullable=False)
+    file_path = Column(String(512), nullable=False)
+
+    @hybrid_property
+    def url(self):
+        return f"{settings.BACKEND_URL}/products/{self.product_id}/images/{self.filename}"
+
 
 
 class ProductReview(Base, IntIdMixin, TimeActionMixin):

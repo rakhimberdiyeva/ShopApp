@@ -6,9 +6,10 @@ from app.auth.models import User
 from app.core.dependencies import get_db
 from app.core.exceptions import Forbidden
 from app.product.managers.characteristics_manager import ProductCharacteristicsManager
+from app.product.managers.image_manager import ProductImageManager
 from app.product.managers.product_manager import ProductManager
 from app.product.managers.review_manager import ProductReviewManager
-from app.product.models import ProductReview, Product
+from app.product.models import ProductReview, Product, ProductImages
 
 
 async def get_product_manager(
@@ -129,4 +130,38 @@ async def is_review_owner(
             "You don't have permission"
         )
 
+
+async def get_product_images_manager(
+        session: AsyncSession = Depends(get_db)
+):
+    """
+    Функция для создания объекта изображений продукта
+
+    :param session: сессия бд
+    :return: объект ProductImageManager
+    """
+
+    return ProductImageManager(session)
+
+
+async def get_product_images_or_404(
+        filename: str,
+        product: Product = Depends(get_product_or_404),
+        manager: ProductImages = Depends(get_product_images_manager),
+):
+    """
+    Функция для получения изображения продукта
+    Если изображения нет вызывает ошибку 404
+
+    :param filename: имя файла
+    :param product: объект продукта
+    :param manager: менеджер изображений продукта
+    :return: объект изображения продукта
+    """
+    image = await manager.get_by_filename(filename=filename)
+    if image.product_id != product.id:
+        raise Forbidden(
+            "You don't have permission"
+        )
+    return image
 

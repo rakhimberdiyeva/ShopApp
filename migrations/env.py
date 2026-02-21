@@ -21,7 +21,7 @@ if config.config_file_name is not None:
 from app.core.models import Base
 from app.auth.models import User
 from app.category.models import Category
-from app.product.models import Product, ProductCharacteristics, ProductReview
+from app.product.models import Product, ProductCharacteristics, ProductReview, ProductImages
 from app.order.models import Order, OrderProduct
 target_metadata = Base.metadata
 

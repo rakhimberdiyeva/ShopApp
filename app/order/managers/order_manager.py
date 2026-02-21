@@ -7,7 +7,7 @@ from app.core.exceptions import NotFound
 from app.order.models import Order
 from app.order.repositories.order_product_repo import OrderProductsRepository
 from app.order.repositories.order_repo import OrderRepository
-from app.order.schemas import OrderCreate
+from app.order.schemas import OrderCreate, OrderUpdate, OrderStatusUpdate
 
 
 class OrderManager:
@@ -54,3 +54,27 @@ class OrderManager:
         await self.session.commit()
 
 
+    async def update(
+            self,
+            request: OrderUpdate,
+            order: Order
+    ):
+        await self.order_repo.update(
+            order,
+            **request.model_dump(exclude={"products"})
+        )
+        await self.order_product_repo.clear(order.id)
+        await self.order_product_repo.create(
+            request.products,
+            order=order
+        )
+        await self.session.commit()
+
+
+    async def update_status(
+            self,
+            request: OrderStatusUpdate,
+            order: Order
+    ):
+        await self.order_repo.update_status(order, request.status)
+        await self.session.commit()

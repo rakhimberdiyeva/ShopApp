@@ -9,7 +9,7 @@ from app.order.depedencies import get_order_or_404, get_order_manager
 from app.order.filters import OrderFilter
 from app.order.managers.order_manager import OrderManager
 from app.order.models import Order
-from app.order.schemas import OrderCreate
+from app.order.schemas import OrderCreate, OrderUpdate, OrderStatusUpdate
 
 router = APIRouter(
     prefix="/order",
@@ -69,3 +69,25 @@ class OrderRouter:
         await self.manager.delete(order)
 
 
+    @router.put(
+        "/{order_id}",
+        summary="обновление заказа",
+    )
+    async def update(
+            self,
+            request: OrderUpdate,
+            order: Order = Depends(get_order_or_404)
+    ):
+        await self.manager.update(request, order)
+
+
+    @router.patch(
+        "/{order_id}",
+        summary="обновление статуса заказа",
+    )
+    async def update_status(
+            self,
+            request: OrderStatusUpdate,
+            order: Order = Depends(get_order_or_404)
+    ):
+        await self.manager.update_status(request, order)

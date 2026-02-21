@@ -2,19 +2,25 @@ from sqlalchemy import insert, update, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.order.models import Order, OrderProduct
-from app.order.schemas import OrderProductsCreate
+from app.order.schemas import OrderProductsCreate, OrderProductsUpdate
 from app.product.dependencies import get_product_or_404
+from app.product.managers.product_manager import ProductManager
 
 
 class OrderProductsRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
+        self.product = ProductManager(session)
 
     async def create(
             self,
-            products: list[OrderProductsCreate],
+            products: list[OrderProductsCreate] | list[OrderProductsUpdate],
             order: Order
     ):
+        product_ids = [p.product_id for p in products]
+        for product_id in product_ids:
+            await self.product.get_product(product_id)
+
         order_products = [
             OrderProduct(
                 order_id=order.id,
@@ -56,5 +62,14 @@ class OrderProductsRepository:
             order_product: OrderProduct
     ) -> None:
         stmt = delete(OrderProduct).where(OrderProduct.order_id == order.id, OrderProduct.product_id == order_product.product_id)
+        await self.session.execute(stmt)
+        await self.session.flush()
+
+
+    async def clear(
+            self,
+            order_id: int
+    ):
+        stmt = delete(OrderProduct).where(OrderProduct.order_id == order_id)
         await self.session.execute(stmt)
         await self.session.flush()
